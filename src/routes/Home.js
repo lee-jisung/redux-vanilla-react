@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
+// import { actionCreators } from '../store';
+import { add } from '../store';
+import ToDo from '../components/ToDo';
 
-function Home({ toDos }) {
-  console.log({ toDos });
+function Home({ toDos, addToDo }) {
   const [text, setText] = useState('');
   const onChange = e => {
     setText(e.target.value);
   };
   const onSubmit = e => {
     e.preventDefault();
+    addToDo(text);
     setText('');
   };
   return (
@@ -18,7 +21,11 @@ function Home({ toDos }) {
         <input type="text" value={text} onChange={onChange} />
         <button>Add</button>
       </form>
-      <ul>{JSON.stringify(toDos)}</ul>
+      <ul>
+        {toDos.map(toDo => (
+          <ToDo {...toDo} key={toDo.id} />
+        ))}
+      </ul>
     </div>
   );
 }
@@ -32,6 +39,16 @@ function mapStateToProps(state) {
   return { toDos: state };
 }
 
+//dispatch => action을 넘기는 함수
+// store.js에 있는 addToDo를 불러와서 사용
+function mapDispatchToProps(dispatch) {
+  return {
+    // addToDo: text => dispatch(actionCreators.addToDo(text)),
+    addToDo: text => dispatch(add(text)),
+  };
+}
+
 // mapStateToProps를 이용해서 store로부터 state를 Home에 가져다 줄 것임
-// 그래서 connect함수를 이용해서 (function)(component) 로 두개를 전달함
-export default connect(mapStateToProps)(Home);
+// 그래서 connect함수를 이용해서 (mapStateToProps, mapDispatchToProps) 로 두개를 전달함
+// component도 export함
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
